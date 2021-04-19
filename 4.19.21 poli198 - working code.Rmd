@@ -1,8 +1,8 @@
 ---
-title: "poli 198 - working code WI'21"
+title: "poli 198 - working code"
 author: Sally Rong
 output: html_notebook
-date: 4/9/21
+date: 4/19/21
 ---
 
 ```{r}
@@ -33,11 +33,11 @@ votes2016 <- read.csv("TSE_PREFEITO_BR_CANDIDATO_2016.csv")
 #Votes data doesn't have SIGLA_UE (aka municipality) variable, need to verify that the votes data is at municipal level.
 
 ## check if there's duplicates, defined by CPF, num_turno
-dup2000 <- votes2000[duplicated(votes2000$CPF_CANDIDATO),] #gives me duplicate rows
-dim(votes2000[duplicated(votes2000$CPF_CANDIDATO),])[1] # gives me number duplicates 
-
-dup2004 <- votes2004[duplicated(votes2004$CPF_CANDIDATO),]
-dim(votes2004[duplicated(votes2004$CPF_CANDIDATO),])[1]
+# dup2000 <- votes2000[duplicated(votes2000$CPF_CANDIDATO),] #gives me # duplicate rows
+# dim(votes2000[duplicated(votes2000$CPF_CANDIDATO),])[1] # gives me number # duplicates 
+# 
+# dup2004 <- votes2004[duplicated(votes2004$CPF_CANDIDATO),]
+# dim(votes2004[duplicated(votes2004$CPF_CANDIDATO),])[1]
 ```
 
 # look at Missing CPF's
@@ -249,27 +249,85 @@ df2016 <- df2016 %>%
 
 # Create WINNER_PARTY variable, which lists the party of the winner for that election (grouping by municipality)
 ```{r}
-testWinnerParty <- df2000 %>%
+# I first created another replacing dataframe of all the parties of winners for each municipality
+winner_replace_df2000 <- df2000 %>%
   group_by(SIGLA_UE) %>%    
   filter(DESC_SIT_TOT_TURNO.x == "ELEITO") %>%
   select(SIGLA_UE, WINNER_PARTY = SIGLA_PARTIDO.x)
+# Then, I join that replacing dataframe w/ the original
+df2000 <- df2000 %>%
+  group_by(SIGLA_UE) %>% 
+  left_join(replace_values, by = "SIGLA_UE")
 
-unique()
+# 2004
+winner_replace_df2004 <- df2004 %>%
+  group_by(SIGLA_UE) %>%    
+  filter(DESC_SIT_TOT_TURNO.x == "ELEITO") %>%
+  select(SIGLA_UE, WINNER_PARTY = SIGLA_PARTIDO.x)
+df2004 <- df2004 %>%
+  group_by(SIGLA_UE) %>% 
+  left_join(replace_values, by = "SIGLA_UE")
 
-## problem b/c then it's only changed for the obs'ns that == "ELEITO"
-# select rather than filter won't work
+# 2008
+winner_replace_df2008 <- df2008 %>%
+  group_by(SIGLA_UE) %>%    
+  filter(DESC_SIT_TOT_TURNO.x == "ELEITO") %>%
+  select(SIGLA_UE, WINNER_PARTY = SIGLA_PARTIDO.x)
+df2008 <- df2008 %>%
+  group_by(SIGLA_UE) %>% 
+  left_join(replace_values, by = "SIGLA_UE")
+
+# 2012
+winner_replace_df2012 <- df2012 %>%
+  group_by(SIGLA_UE) %>%    
+  filter(DESC_SIT_TOT_TURNO.x == "ELEITO") %>%
+  select(SIGLA_UE, WINNER_PARTY = SIGLA_PARTIDO.x)
+df2012 <- df2012 %>%
+  group_by(SIGLA_UE) %>% 
+  left_join(replace_values, by = "SIGLA_UE")
+
+# 2016
+winner_replace_df2016 <- df2016 %>%
+  group_by(SIGLA_UE) %>%    
+  filter(DESC_SIT_TOT_TURNO.x == "ELEITO") %>%
+  select(SIGLA_UE, WINNER_PARTY = SIGLA_PARTIDO.x)
+df2016 <- df2016 %>%
+  group_by(SIGLA_UE) %>% 
+  left_join(replace_values, by = "SIGLA_UE")
 ```
 
 # Create 'runoff' variable, a dummy variable of municipalities that went to a 2nd election.
 ```{r}
-
+df2000$runoff <- as.integer(df2000$DESC_SIT_TOT_TURNO.x == "2º TURNO")
+df2004$runoff <- as.integer(df2004$DESC_SIT_TOT_TURNO.x == "2º TURNO")
+df2008$runoff <- as.integer(df2008$DESC_SIT_TOT_TURNO.x == "2º TURNO")
+df2012$runoff <- as.integer(df2012$DESC_SIT_TOT_TURNO.x == "2º TURNO")
+df2016$runoff <- as.integer(df2016$DESC_SIT_TOT_TURNO.x == "2º TURNO")
 ```
 
 
 # Merging datasets
 ```{r}
-#testdf <- rbind(df2008, df2012)
-#testdf2 <- rbind(testdf, df2004)
+df2000 <- df2000 %>% mutate(CPF_CANDIDATO = as.character(CPF_CANDIDATO))
+df2004 <- df2004 %>% mutate(CPF_CANDIDATO = as.character(CPF_CANDIDATO))
+df2008 <- df2008 %>% mutate(CPF_CANDIDATO = as.character(CPF_CANDIDATO))
+df2012 <- df2012 %>% mutate(CPF_CANDIDATO = as.character(CPF_CANDIDATO))
+df2016 <- df2016 %>% mutate(CPF_CANDIDATO = as.character(CPF_CANDIDATO))
+
+df2000 <- df2000 %>% mutate(CPF_CANDIDATO = as.character(CPF_CANDIDATO))
+df2004 <- df2004 %>% mutate(CPF_CANDIDATO = as.character(CPF_CANDIDATO))
+df2008 <- df2008 %>% mutate(CPF_CANDIDATO = as.character(CPF_CANDIDATO))
+df2012 <- df2012 %>% mutate(CPF_CANDIDATO = as.character(CPF_CANDIDATO))
+df2016 <- df2016 %>% mutate(CPF_CANDIDATO = as.character(CPF_CANDIDATO))
+
+df2000 <- df2000 %>% mutate(NUM_TITULO_ELEITORAL_CANDIDATO = as.character(NUM_TITULO_ELEITORAL_CANDIDATO))
+df2004 <- df2004 %>% mutate(NUM_TITULO_ELEITORAL_CANDIDATO = as.character(NUM_TITULO_ELEITORAL_CANDIDATO))
+df2008 <- df2008 %>% mutate(NUM_TITULO_ELEITORAL_CANDIDATO = as.character(NUM_TITULO_ELEITORAL_CANDIDATO))
+df2012 <- df2012 %>% mutate(NUM_TITULO_ELEITORAL_CANDIDATO = as.character(NUM_TITULO_ELEITORAL_CANDIDATO))
+df2016 <- df2016 %>% mutate(NUM_TITULO_ELEITORAL_CANDIDATO = as.character(NUM_TITULO_ELEITORAL_CANDIDATO))
+
+mergedData <- rbind(df2000, df2004, df2008, df2012, df2016)
+write.csv(mergedData, "mergedData.csv")
 ```
 
 Questions
