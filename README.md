@@ -13,8 +13,8 @@ The datasets on Electoral Results can be downloaded from <a href="https://cepesp
   This R Markdown file contains all the code written as part of this data cleaning project.
   <h3>5.26.21 poli198 - Code.html</h3>
   This is an HTML document converted from the R Markdown file.
-  <h3>pseudo_CPF.xlsx</h3>
-    This Excel spreadsheet contains documentation of data that I manually updated for the “CPF_CANDIDATO” variable.
+  <h3>pseudo_CPF.csv</h3>
+    This CSV file is documentation of the data that I manually updated for the “CPF_CANDIDATO” variable.
     <br><br>
 The raw data downloaded from the CEPESP website contained “#NULO”, or null, observations for the “CPF_CANDIDATO” variable. By cross referencing the votes and candidate datasets, I was able to match observations with null CPF’s. To deal with the problem of null observations, I created eleven-digit pseudo CPF numbers that started with 999999999xx and manually updated the null observations.
     <br><br>
